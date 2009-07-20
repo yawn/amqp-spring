@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="connection" class="org.springframework.amqp.connection.ConnectionFactoryBean"/>
+
+    <bean id="channelFactory" class="org.springframework.amqp.connection.channel.ChannelFactoryBean">
+        <property name="connection" ref="connection"/>
+    </bean>
+
+    <bean id="threadLocalChannelSource" class="org.springframework.aop.target.ThreadLocalTargetSource">
+        <property name="targetBeanName" value="channelFactory"/>
+    </bean>
+
+    <bean id="threadLocalChannelFactory" factory-bean="threadLocalChannelSource" factory-method="getTarget"/>
+
+    <bean id="component" abstract="true">
+        <property name="channel" ref="threadLocalChannelFactory"/>
+     </bean>
+
+    <bean id="myExchange" class="org.springframework.amqp.component.common.DefaultTopicExchange" parent="component"/>
+
+    <bean id="myQueue" class="org.springframework.amqp.component.common.ReplyQueue" parent="component"/>
+
+    <bean class="org.springframework.amqp.component.Binding" parent="component">
+        <property name="exchange" ref="myExchange"/>
+        <property name="queue" ref="myQueue"/>
+        <property name="key" value="de.*.berlin.#"/>
+    </bean>
+
+    <bean id="mySubscription" class="org.springframework.amqp.message.Subscription" parent="component">
+        <property name="queue" ref="myQueue"/>
+        <property name="receiver">
+            <bean class="org.springframework.amqp.message.TestConsumer"/>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.scheduling.timer.TimerFactoryBean">
+        <property name="scheduledTimerTasks">
+            <list>
+                <bean class="org.springframework.scheduling.timer.ScheduledTimerTask">
+                    <property name="period" value="5000"/>
+                    <property name="timerTask">
+                        <bean class="org.springframework.amqp.message.TestProducer">
+                            <property name="exchange" ref="myExchange"/>
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.amqp.util.AutoDeclaringBeanPostProcessor"/>
+
+</beans>
