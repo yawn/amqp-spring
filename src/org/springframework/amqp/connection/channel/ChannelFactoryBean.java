@@ -13,10 +13,8 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.WeakHashMap;
-import java.util.Map;
 
-public class ChannelFactoryBean implements ChannelSource, FactoryBean, DisposableBean {
+public class ChannelFactoryBean implements FactoryBean, DisposableBean {
 
     private static final Log log = LogFactory.getLog(ChannelFactoryBean.class);
 
@@ -28,16 +26,6 @@ public class ChannelFactoryBean implements ChannelSource, FactoryBean, Disposabl
     private String closeMessage = DEFAULT_CLOSE_MESSAGE;
 
     private Set<Reference<Channel>> channelReferenceSet = new HashSet<Reference<Channel>>();
-
-    public Channel getChannel() {
-
-        try {
-            return (Channel) getObject();
-        } catch (Exception e) {
-            throw new AMQException("Unable to create channel", e);
-        }
-        
-    }
 
     public Connection getConnection() {
         return connection;
@@ -67,7 +55,7 @@ public class ChannelFactoryBean implements ChannelSource, FactoryBean, Disposabl
         return channelReferenceSet;
     }
 
-    public Object getObject() throws Exception {
+    public Channel getObject() throws Exception {
 
         final Channel channel = connection.createChannel();
         channelReferenceSet.add(new WeakReference<Channel>(channel));
@@ -80,7 +68,7 @@ public class ChannelFactoryBean implements ChannelSource, FactoryBean, Disposabl
         return Channel.class;
     }
 
-    public boolean isSingleton() {
+    public final boolean isSingleton() {
         return false;
     }
 

@@ -23,10 +23,10 @@ public class TestChannelFactoryBean extends AbstractConnectionTest {
         channelFactoryBean.setCloseMessage("So Long, and Thanks for All the Fish");
 
         {
-            Channel c1 = channelFactoryBean.getChannel();
+            Channel c1 = channelFactoryBean.getObject();
             assertTrue(c1.isOpen());
 
-            Channel c2 = channelFactoryBean.getChannel();
+            Channel c2 = channelFactoryBean.getObject();
             assertNotSame(c1, c2);
         }
 
