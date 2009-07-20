@@ -126,7 +126,12 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Appli
         connection.addShutdownListener(new ShutdownListener() {
 
             public void shutdownCompleted(ShutdownSignalException cause) {
+
+                if (log.isInfoEnabled())
+                    log.info("Connection shutdown", cause);
+
                 applicationEventPublisher.publishEvent(new Shutdown(cause));
+                
             }
 
         });
