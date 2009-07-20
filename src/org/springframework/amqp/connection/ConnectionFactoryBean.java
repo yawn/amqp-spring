@@ -4,14 +4,19 @@ import com.rabbitmq.client.*;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.BeansException;
 import org.springframework.util.StringUtils;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.ApplicationEventPublisher;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
 import javax.net.SocketFactory;
 import java.util.Arrays;
 
-public class ConnectionFactoryBean extends ConnectionParameters implements FactoryBean, InitializingBean, DisposableBean {
+public class ConnectionFactoryBean extends ConnectionParameters implements ApplicationEventPublisherAware, FactoryBean, InitializingBean, DisposableBean {
 
     private static final Log log = LogFactory.getLog(ConnectionFactoryBean.class);
 
@@ -20,12 +25,18 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Facto
     public static int DEFAULT_MAX_REDIRECTS = 0;
     public static int DEFAULT_CONNECTION_CLOSE_TIMEOUT = -1; // infinity
 
+    private ApplicationEventPublisher applicationEventPublisher;
+
     private SocketFactory socketFactory;
     private Address[] addresses = { new Address(DEFAULT_HOST_NAME, DEFAULT_PORT) };
     private int maxRedirects = DEFAULT_MAX_REDIRECTS;
     private int connectionCloseTimeout = DEFAULT_CONNECTION_CLOSE_TIMEOUT;
 
     private Connection connection;
+
+    public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
 
     public SocketFactory getSocketFactory() {
         return socketFactory;
@@ -70,18 +81,6 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Facto
 
     }
 
-    public Object getObject() throws Exception {
-        return connection;
-    }
-
-    public Class getObjectType() {
-        return Connection.class;
-    }
-
-    public boolean isSingleton() {
-        return true;
-    }
-
     protected String formatPassword(String password) {
 
         char[] formatted = new char[password.length()];
@@ -101,6 +100,18 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Facto
 
     }
 
+    public Object getObject() throws Exception {
+        return connection;
+    }
+
+    public Class getObjectType() {
+        return Connection.class;
+    }
+
+    public boolean isSingleton() {
+        return true;
+    }
+
     public void afterPropertiesSet() throws Exception {
 
         if (log.isInfoEnabled())
@@ -111,7 +122,15 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Facto
                     getVirtualHost()));
 
         this.connection = newConnectionFactory().newConnection(addresses, maxRedirects);
-        
+
+        connection.addShutdownListener(new ShutdownListener() {
+
+            public void shutdownCompleted(ShutdownSignalException cause) {
+                applicationEventPublisher.publishEvent(new Shutdown(cause));
+            }
+
+        });
+
     }
 
     public void destroy() throws Exception {
