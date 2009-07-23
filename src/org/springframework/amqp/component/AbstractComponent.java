@@ -1,6 +1,7 @@
 package org.springframework.amqp.component;
 
 import com.rabbitmq.client.Channel;
+import org.springframework.beans.factory.annotation.Required;
 
 public abstract class AbstractComponent implements Component {
 
@@ -10,6 +11,7 @@ public abstract class AbstractComponent implements Component {
         return channel;
     }
 
+    @Required
     public void setChannel(Channel channel) {
         this.channel = channel;
     }

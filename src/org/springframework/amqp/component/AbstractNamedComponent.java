@@ -1,5 +1,7 @@
 package org.springframework.amqp.component;
 
+import org.springframework.beans.factory.annotation.Required;
+
 public abstract class AbstractNamedComponent extends AbstractComponent implements NamedComponent {
 
     private String name;
@@ -8,6 +10,7 @@ public abstract class AbstractNamedComponent extends AbstractComponent implement
         return name;
     }
 
+    @Required
     public void setName(String name) {
         this.name = name;
     }
