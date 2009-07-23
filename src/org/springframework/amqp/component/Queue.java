@@ -32,7 +32,6 @@ public class Queue extends AbstractNamedComponent {
     }
 
     private EnumSet properties;
-    private Exchange defaultExchange;
 
     public EnumSet getProperties() {
         return properties;
@@ -65,15 +64,6 @@ public class Queue extends AbstractNamedComponent {
     }
 
     public void send(Message message) {
-
-        /*
-        if (defaultExchange == null)
-            defaultExchange = DefaultExchange.declare(getChannel());
-
-        message.setRoutingKey(getName());
-        defaultExchange.send(message);
-         */
-
     }
 
     @Override
