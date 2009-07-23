@@ -10,17 +10,32 @@ import java.io.IOException;
 
 public class Exchange extends AbstractNamedComponent {
 
-    public enum Type {
+    public static final CharSequence DEFAULT_TYPE = Type.DIRECT;
+
+    public enum Type implements CharSequence {
 
         FANOUT,
         DIRECT,
         TOPIC,
         HEADER;
 
-        public String toString() {
-            return super.toString().toLowerCase().intern();
+        public int length() {
+            return toString().length();
         }
 
+        public char charAt(int i) {
+            return toString().charAt(i);
+        }
+
+        public CharSequence subSequence(int i, int i1) {
+            return toString().subSequence(i, i1);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+        
     }
 
     public enum Property {
@@ -33,7 +48,7 @@ public class Exchange extends AbstractNamedComponent {
     private static final Log log = LogFactory.getLog(Exchange.class);
 
     private Property property;
-    private Type type;
+    private CharSequence type = DEFAULT_TYPE;
 
     public Property getProperty() {
         return property;
@@ -43,11 +58,11 @@ public class Exchange extends AbstractNamedComponent {
         this.property = property;
     }
 
-    public Type getType() {
+    public CharSequence getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(CharSequence type) {
         this.type = type;
     }
 
@@ -58,7 +73,7 @@ public class Exchange extends AbstractNamedComponent {
 
         try {
             getChannel().exchangeDeclare(getName(),
-                    type.toString(),
+                    type.toString().intern(),
                     passive,
                     property == Property.DURABLE,
                     property == Property.AUTO_DELETE,
