@@ -33,7 +33,7 @@ public class Exchange extends AbstractNamedComponent {
 
         @Override
         public String toString() {
-            return super.toString().toLowerCase();
+            return super.toString().toLowerCase().intern();
         }
         
     }

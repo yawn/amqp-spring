@@ -1,68 +1,57 @@
 package org.springframework.amqp.component;
 
-import org.springframework.amqp.AMQException;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
-import java.util.Collections;
-import java.io.IOException;
-
 import com.rabbitmq.client.Channel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.amqp.AMQException;
+import org.springframework.amqp.component.util.CollectionUtil;
 
-public class Binding extends AbstractComponent {
+import java.io.IOException;
+import java.util.Set;
+
+public class Binding implements Component {
 
     private static final Log log = LogFactory.getLog(Binding.class);
 
     public static String NO_KEY = "";
 
-    private Exchange exchange;
-    private Queue queue;
-    private String key = NO_KEY;
+    private Set<Exchange> exchanges;
+    private Set<Queue> queues;
+    private Set<String> keys;
 
-    @Override
-    public Channel getChannel() {
-
-        Channel channel = super.getChannel();
-
-        if (channel != null)
-            return channel;
-
-        channel = getExchange().getChannel();
-
-        if (channel != null)
-            return channel;
-
-        channel = getQueue().getChannel();
-
-        if (channel != null)
-            return channel;
-
-        throw new AMQException(String.format("No channel available for binding '%s'", this));
-
+    @SuppressWarnings({"unchecked"})
+    public Binding() {
+        exchanges = CollectionUtil.EMPTY_SET();
+        queues = CollectionUtil.EMPTY_SET();
+        keys = CollectionUtil.EMPTY_SET(NO_KEY);
     }
 
-    public Exchange getExchange() {
-        return exchange;
+    public Set<Exchange> getExchanges() {
+        return exchanges;
     }
 
-    public void setExchange(Exchange exchange) {
-        this.exchange = exchange;
+    public void setExchanges(Set<Exchange> exchanges) {
+        this.exchanges = exchanges;
     }
 
-    public Queue getQueue() {
-        return queue;
+    public Set<Queue> getQueues() {
+        return queues;
     }
 
-    public void setQueue(Queue queue) {
-        this.queue = queue;
+    public void setQueues(Set<Queue> queues) {
+        this.queues = queues;
     }
 
-    public String getKey() {
-        return key;
+    public Set<String> getKeys() {
+        return keys;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setKeys(Set<String> keys) {
+        this.keys = keys;
+    }
+
+    protected Channel getChannel() {
+        return exchanges.iterator().next().getChannel();
     }
 
     public void declare() {
@@ -70,10 +59,16 @@ public class Binding extends AbstractComponent {
         if (log.isInfoEnabled())
             log.info(String.format("Declaring binding %s", this));
 
-        try {
-            getChannel().queueBind(queue.getName(), exchange.getName(), key);
-        } catch (IOException e) {
-            throw new AMQException(String.format("Could not declare binding '%s'", this), e);
+        for (Exchange exchange : exchanges) {
+            for (Queue queue : queues) {
+                for (String key : keys) {
+                    try {
+                        getChannel().queueBind(queue.getName(), exchange.getName(), key);
+                    } catch (IOException e) {
+                        throw new AMQException(String.format("Could not declare binding '%s'", this), e);
+                    }
+                }
+            }
         }
 
     }
@@ -81,10 +76,10 @@ public class Binding extends AbstractComponent {
     @Override
     public String toString() {
         return "Binding{" +
-                "exchange=" + exchange +
-                ", queue=" + queue +
-                ", key='" + key + '\'' +
+                "exchanges=" + exchanges +
+                ", queues=" + queues +
+                ", keys=" + keys +
                 '}';
     }
-
+    
 }

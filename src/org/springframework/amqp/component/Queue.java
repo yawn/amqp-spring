@@ -1,17 +1,16 @@
 package org.springframework.amqp.component;
 
-import org.springframework.amqp.AMQException;
-import org.springframework.amqp.component.common.DefaultExchange;
-import org.springframework.amqp.message.Message;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.amqp.AMQException;
+import org.springframework.amqp.component.util.CollectionUtil;
+import org.springframework.amqp.message.Message;
 
-import java.util.EnumSet;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.io.IOException;
-
-import com.rabbitmq.client.AMQP;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class Queue extends AbstractNamedComponent {
 
@@ -19,28 +18,45 @@ public class Queue extends AbstractNamedComponent {
 
     private static final EnumSet INVALID_COMBINATION = EnumSet.of(Property.AUTO_DELETE, Property.DURABLE);
 
-    public enum Property {
+    public enum Property implements CharSequence {
 
         DURABLE,
         AUTO_DELETE,
-        EXCLUSIVE
+        EXCLUSIVE;
+
+        public int length() {
+            return toString().length();
+        }
+
+        public char charAt(int i) {
+            return toString().charAt(i);
+        }
+
+        public CharSequence subSequence(int i, int i1) {
+            return toString().subSequence(i, i1);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase().intern();
+        }
 
     }
 
-    public Queue() {
-        properties = EnumSet.noneOf(Property.class);
-    }
+    private Set<CharSequence> properties = CollectionUtil.EMPTY_SET();
 
-    private EnumSet properties;
-
-    public EnumSet getProperties() {
+    public Set<CharSequence> getProperties() {
         return properties;
     }
 
-    public void setProperties(Property... properties) {
-        this.properties = EnumSet.copyOf(Arrays.asList(properties));
+    public void addProperties(Property... properties) {
+        this.properties.addAll(Arrays.asList(properties));
     }
-    
+
+    public void setProperties(Set<CharSequence> properties) {
+        this.properties = properties;
+    }
+
     public void declare(final boolean passive) {
 
         if (getProperties().containsAll(INVALID_COMBINATION))
