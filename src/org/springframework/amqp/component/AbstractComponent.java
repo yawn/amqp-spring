@@ -11,7 +11,6 @@ public abstract class AbstractComponent implements Component {
         return channel;
     }
 
-    @Required
     public void setChannel(Channel channel) {
         this.channel = channel;
     }

@@ -10,7 +10,6 @@ public abstract class AbstractNamedComponent extends AbstractComponent implement
         return name;
     }
 
-    @Required
     public void setName(String name) {
         this.name = name;
     }
