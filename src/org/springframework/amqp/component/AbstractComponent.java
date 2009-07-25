@@ -1,7 +1,6 @@
 package org.springframework.amqp.component;
 
 import com.rabbitmq.client.Channel;
-import org.springframework.beans.factory.annotation.Required;
 
 public abstract class AbstractComponent implements Component {
 

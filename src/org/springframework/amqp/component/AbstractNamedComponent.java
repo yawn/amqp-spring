@@ -1,7 +1,5 @@
 package org.springframework.amqp.component;
 
-import org.springframework.beans.factory.annotation.Required;
-
 public abstract class AbstractNamedComponent extends AbstractComponent implements NamedComponent {
 
     private String name;
