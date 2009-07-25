@@ -19,7 +19,7 @@ public class AutoDeclaringBeanPostProcessor implements BeanPostProcessor {
         if (o instanceof Component) {
 
             if (log.isInfoEnabled())
-                log.info(String.format("Auto declaring AMQ component bean '%s'", s));
+                log.info(String.format("Auto declaring AMQ '%s' component bean '%s'", o.getClass().getSimpleName(), s));
 
             ((Component)o).declare();
 
