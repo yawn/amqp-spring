@@ -1,0 +1,16 @@
+A very raw sketch for a possible AMQP-Spring integration.
+
+h2. What it does do atm.?
+
+* Provides connection and channel factory abstractions
+* Provides classes for exchanges, queues, bindings (many bindings wrapped in one binding class actually), messages and subscriptions (the latter two are very raw currently)
+* A custom namespace for components (exchanges, queues, bindings)
+* A few preconfigured components like reply queues or the default exchange
+
+h2. What is planned for it?
+
+* Refreshable channels and connection (that is - they can re-establish a connection to a message broker if the connection fails
+* Autowiring of all channel requiring components if only one connection is detected in the application context
+* Better abstractions for producers and consumers
+* Sensible exceptions
+* Stuff
