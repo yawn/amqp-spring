@@ -1,0 +1,1 @@
+http\://www.springframework.org/schema/amqp/components=org.springframework.amqp.component.xml.ComponentNamespaceHandler

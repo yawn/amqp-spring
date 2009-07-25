@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/amqp/components"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            targetNamespace="http://www.springframework.org/schema/amqp/components"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+    <xsd:simpleType name="exchange_property">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="durable"/>
+            <xsd:enumeration value="exclusive"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="exchange_properties">
+        <xsd:list itemType="exchange_property"/>
+    </xsd:simpleType>
+
+    <xsd:element name="exchange">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="channel-ref" type="xsd:string"/>
+                    <xsd:attribute name="type" type="xsd:string" default="direct"/>
+                    <xsd:attribute name="name" type="xsd:string"/>
+                    <xsd:attribute name="properties" type="exchange_properties"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:simpleType name="queue_property">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="durable"/>
+            <xsd:enumeration value="exclusive"/>
+            <xsd:enumeration value="auto_delete"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="queue_properties">
+        <xsd:list itemType="queue_property"/>
+    </xsd:simpleType>
+
+    <xsd:element name="queue">
+        <xsd:complexType>
+            <xsd:complexContent>
+                <xsd:extension base="beans:identifiedType">
+                    <xsd:attribute name="channel-ref" use="required" type="xsd:string"/>
+                    <xsd:attribute name="name" use="required" type="xsd:string"/>
+                    <xsd:attribute name="properties" type="queue_properties"/>
+                </xsd:extension>
+            </xsd:complexContent>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:simpleType name="binding_keys">
+        <xsd:list itemType="xsd:string"/>
+    </xsd:simpleType>
+
+    <xsd:element name="binding">
+        <xsd:complexType>
+            <xsd:attribute name="exchange-ref" type="xsd:string"/>
+            <xsd:attribute name="exchange-refs" type="xsd:string"/>
+            <xsd:attribute name="queue-ref" type="xsd:string"/>
+            <xsd:attribute name="queue-refs" type="xsd:string"/>
+            <xsd:attribute name="key" type="xsd:string"/>
+            <xsd:attribute name="keys" type="binding_keys"/>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

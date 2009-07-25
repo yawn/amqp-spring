@@ -13,7 +13,8 @@ public class TestConsumer implements MessageConsumer {
     public void receive(Message message, AckHandler handler) {
 
         if (log.isInfoEnabled())
-            log.info(String.format("I received a message %s", message));
+            log.info(String.format("I received via %s a message %s", message.getEnvelope().getRoutingKey(),
+                    message.getPayloadAsString()));
 
         handler.acknowledge();
 

@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:amqp="http://www.springframework.org/schema/amqp/components"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation=
+               "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/amqp/components http://www.springframework.org/schema/amqp/components.xsd
+                http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+    <!-- connect to an amqp broker using defaults for username etc. -->
     <bean id="connection" class="org.springframework.amqp.connection.ConnectionFactoryBean"/>
 
-    <bean id="channelFactory" class="org.springframework.amqp.connection.channel.ChannelFactoryBean">
-        <property name="connection" ref="connection"/>
-    </bean>
+    <!-- establish a source for channels -->
+    <bean id="channelFactory" class="org.springframework.amqp.connection.channel.ChannelFactoryBean"
+          p:connection-ref="connection"/>
 
-    <bean id="threadLocalChannelSource" class="org.springframework.aop.target.ThreadLocalTargetSource">
-        <property name="targetBeanName" value="channelFactory"/>
-    </bean>
+    <!-- wrap them in a thread locale you don't have to care from where to access a channel -->
+    <bean id="threadLocalChannelSource" class="org.springframework.aop.target.ThreadLocalTargetSource"
+          p:targetBeanName="channelFactory"/>
 
     <bean id="threadLocalChannelFactory" factory-bean="threadLocalChannelSource" factory-method="getTarget"/>
 
+    <!-- all components (except bindings) need a channel -->
     <bean id="component" abstract="true">
         <property name="channel" ref="threadLocalChannelFactory"/>
-     </bean>
+    </bean>
 
+    <!-- declare an exchange -->
     <bean id="myExchange" class="org.springframework.amqp.component.common.DefaultTopicExchange" parent="component"/>
 
+    <!-- and a queue and two subscriptions -->
     <bean id="myQueue" class="org.springframework.amqp.component.common.ReplyQueue" parent="component"/>
-
-    <bean class="org.springframework.amqp.component.Binding" parent="component">
-        <property name="exchange" ref="myExchange"/>
-        <property name="queue" ref="myQueue"/>
-        <property name="key" value="de.*.berlin.#"/>
-    </bean>
 
     <bean id="mySubscription" class="org.springframework.amqp.message.Subscription" parent="component">
         <property name="queue" ref="myQueue"/>
@@ -36,15 +39,37 @@
         </property>
     </bean>
 
+    <bean id="mySubscription2" class="org.springframework.amqp.message.Subscription" parent="component">
+        <property name="queue" ref="myQueue"/>
+        <property name="receiver">
+            <bean class="org.springframework.amqp.message.TestConsumer"/>
+        </property>
+    </bean>
+
+    <!-- a more concise syntax for components -->
+    <!-- if no id supplied namend components (exchanges and queues) have an id that is identical to their name -->
+    <amqp:exchange channel-ref="channelFactory" name="myUnusedExchange" type="topic"/>
+    <amqp:queue channel-ref="channelFactory" name="myUnusedQueue" properties="auto_delete exclusive"/>
+
+    <amqp:binding exchange-ref="myExchange" queue-refs="myQueue myUnusedQueue" keys="de.#.kreuzberg uk.london.#"/>
+
     <bean class="org.springframework.scheduling.timer.TimerFactoryBean">
         <property name="scheduledTimerTasks">
             <list>
                 <bean class="org.springframework.scheduling.timer.ScheduledTimerTask">
                     <property name="period" value="5000"/>
                     <property name="timerTask">
-                        <bean class="org.springframework.amqp.message.TestProducer">
-                            <property name="exchange" ref="myExchange"/>
-                        </bean>
+                        <bean class="org.springframework.amqp.message.TestProducer"
+                              p:routingKey="de.bb.berlin.west.kreuzberg"
+                              p:exchange-ref="myExchange"/>
+                    </property>
+                </bean>
+                <bean class="org.springframework.scheduling.timer.ScheduledTimerTask">
+                    <property name="period" value="2500"/>
+                    <property name="timerTask">
+                        <bean class="org.springframework.amqp.message.TestProducer"
+                              p:routingKey="uk.london.east"
+                              p:exchange-ref="myExchange"/>
                     </property>
                 </bean>
             </list>
