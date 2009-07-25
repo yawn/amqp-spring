@@ -4,7 +4,7 @@ h2. What it does do atm.?
 
 * Provides connection and channel factory abstractions
 * Provides classes for exchanges, queues, bindings (many bindings wrapped in one binding class actually), messages and subscriptions (the latter two are very raw currently)
-* A custom namespace for components (exchanges, queues, bindings)
+* A custom "namespace":http://github.com/yawn/amqp-spring/blob/30178e8650c1b93447e0474555a8ce87cdbff4e5/src/spring-config.xml for components (exchanges, queues, bindings)
 * A few preconfigured components like reply queues or the default exchange
 
 h2. What is planned for it?
