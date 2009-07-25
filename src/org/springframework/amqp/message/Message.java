@@ -4,9 +4,6 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
 
 import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.util.StringUtils;
 
 public class Message {
 
@@ -89,6 +86,10 @@ public class Message {
 
     public void setPayload(byte[] payload) {
         this.payload = payload;
+    }
+
+    public String getPayloadAsString() {
+        return new String(getPayload());
     }
 
     protected String formatPayload(byte[] payload) {
