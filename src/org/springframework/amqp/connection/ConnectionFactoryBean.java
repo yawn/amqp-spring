@@ -4,6 +4,7 @@ import com.rabbitmq.client.*;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.BeansException;
 import org.springframework.util.StringUtils;
 import org.springframework.context.ApplicationContextAware;
@@ -16,7 +17,7 @@ import org.apache.commons.logging.Log;
 import javax.net.SocketFactory;
 import java.util.Arrays;
 
-public class ConnectionFactoryBean extends ConnectionParameters implements ApplicationEventPublisherAware, FactoryBean, InitializingBean, DisposableBean {
+public class ConnectionFactoryBean extends ConnectionParameters implements ApplicationEventPublisherAware, BeanNameAware, FactoryBean, InitializingBean, DisposableBean {
 
     private static final Log log = LogFactory.getLog(ConnectionFactoryBean.class);
 
@@ -33,9 +34,18 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Appli
     private int connectionCloseTimeout = DEFAULT_CONNECTION_CLOSE_TIMEOUT;
 
     private Connection connection;
+    private String beanName;
 
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
+    }
+
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
+    }
+
+    public String getBeanName() {
+        return beanName;
     }
 
     public SocketFactory getSocketFactory() {
@@ -94,7 +104,7 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Appli
 
     protected String formatBrokerAddresses(Address[] addresses) {
 
-        return String.format("AMQP broker%s: %s",
+        return String.format("AMQP broker%s %s",
                 addresses.length > 1 ? "s" : "",
                 StringUtils.arrayToCommaDelimitedString(addresses));
 
@@ -123,6 +133,8 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Appli
 
         this.connection = newConnectionFactory().newConnection(addresses, maxRedirects);
 
+        final ConnectionFactoryBean connectionFactoryBean = this;
+
         connection.addShutdownListener(new ShutdownListener() {
 
             public void shutdownCompleted(ShutdownSignalException cause) {
@@ -130,7 +142,7 @@ public class ConnectionFactoryBean extends ConnectionParameters implements Appli
                 if (log.isInfoEnabled())
                     log.info("Connection shutdown", cause);
 
-                applicationEventPublisher.publishEvent(new Shutdown(cause));
+                applicationEventPublisher.publishEvent(new Shutdown(connectionFactoryBean, cause));
                 
             }
 

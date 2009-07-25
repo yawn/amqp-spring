@@ -1,17 +1,24 @@
 package org.springframework.amqp.connection;
 
-import org.springframework.context.ApplicationEvent;
 import com.rabbitmq.client.ShutdownSignalException;
+import org.springframework.context.ApplicationEvent;
 
 public class Shutdown extends ApplicationEvent {
 
-    public Shutdown(ShutdownSignalException cause) {
+    private ConnectionFactoryBean connectionFactoryBean;
+
+    public Shutdown(ConnectionFactoryBean connectionFactoryBean, ShutdownSignalException cause) {
         super(cause);
+        this.connectionFactoryBean = connectionFactoryBean;
     }
 
     @Override
     public ShutdownSignalException getSource() {
         return (ShutdownSignalException) super.getSource();
+    }
+
+    public ConnectionFactoryBean getConnectionFactoryBean() {
+        return connectionFactoryBean;
     }
 
 }
