@@ -1,24 +1,13 @@
 package org.springframework.amqp.component.common;
 
-import org.springframework.amqp.component.Exchange;
-import com.rabbitmq.client.Channel;
+import org.springframework.amqp.component.ExchangeImpl;
 
-public class DefaultExchange extends Exchange {
-
-    public static Exchange declare(Channel channel) {
-
-        Exchange exchange = new DefaultExchange();
-        exchange.setChannel(channel);
-        exchange.declare();
-
-        return exchange;
-
-    }
+public class DefaultExchange extends ExchangeImpl {
 
     public DefaultExchange() {
         setName("");
         setProperty(Property.DURABLE);
-        setType(Exchange.Type.DIRECT);
+        setType(ExchangeImpl.Type.DIRECT);
     }
 
 }

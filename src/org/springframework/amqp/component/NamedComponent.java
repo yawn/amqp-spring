@@ -1,9 +1,11 @@
 package org.springframework.amqp.component;
 
-import org.springframework.amqp.message.MessageProducer;
+import org.springframework.amqp.message.MessageSource;
 
-public interface NamedComponent extends Component, MessageProducer {
+public interface NamedComponent extends Component, MessageSource {
 
-    public void declare(boolean passive);
+    public String getName();
+
+    public void declare(boolean passive) throws Exception;
 
 }

@@ -12,7 +12,7 @@ public abstract class AbstractNamedComponent extends AbstractComponent implement
         this.name = name;
     }
 
-    public void declare() {
+    public void declare() throws Exception {
         declare(false);
     }
 

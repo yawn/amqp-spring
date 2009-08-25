@@ -6,7 +6,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import static org.springframework.util.StringUtils.hasText;
-import org.springframework.amqp.component.Binding;
+import org.springframework.amqp.component.BindingImpl;
 
 import java.util.*;
 
@@ -14,7 +14,7 @@ public class BindingBeanDefinitionParser extends AbstractComponentBeanDefinition
 
     @Override
     protected Class getBeanClass(Element element) {
-        return Binding.class;
+        return BindingImpl.class;
     }
 
     @Override

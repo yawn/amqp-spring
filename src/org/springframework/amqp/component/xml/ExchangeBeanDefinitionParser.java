@@ -1,18 +1,15 @@
 package org.springframework.amqp.component.xml;
 
+import org.springframework.amqp.component.ExchangeImpl;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import static org.springframework.util.StringUtils.*;
-import org.springframework.amqp.component.Exchange;
-import org.springframework.amqp.component.xml.AbstractNamedComponentBeanDefinitionParser;
+import static org.springframework.util.StringUtils.hasText;
 import org.w3c.dom.Element;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 public class ExchangeBeanDefinitionParser extends AbstractNamedComponentBeanDefinitionParser {
 
     protected Class getBeanClass(Element element) {
-        return Exchange.class;
+        return ExchangeImpl.class;
     }
 
     protected void doComponentParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
