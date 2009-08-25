@@ -1,14 +1,12 @@
 package org.springframework.amqp.message;
 
-import org.springframework.amqp.component.Exchange;
-import org.springframework.amqp.message.Message;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.amqp.component.Exchange;
 
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.Calendar;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimerTask;
 
 public class TestProducer extends TimerTask {
 
@@ -33,7 +31,7 @@ public class TestProducer extends TimerTask {
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
 
-        exchange.send(new Message(String.format("The local time is %s", format.format(calendar.getTime())), routingKey));
+        exchange.send(new MessageImpl(String.format("The local time is %s", format.format(calendar.getTime())), routingKey));
 
     }
 
