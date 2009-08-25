@@ -3,7 +3,7 @@ package org.springframework.amqp.message;
 import org.springframework.amqp.message.header.EmptyHeader;
 import org.springframework.amqp.message.header.Header;
 
-public class MessageImpl extends AbstractMessage<Header> implements Message {
+public class MessageImpl extends AbstractMessage<Header> implements SentMessage {
 
     public MessageImpl(byte[] body) {
         super(body, EmptyHeader.INSTANCE);

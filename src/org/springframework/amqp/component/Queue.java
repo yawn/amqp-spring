@@ -1,11 +1,8 @@
 package org.springframework.amqp.component;
 
-import org.springframework.amqp.message.MessageSink;
-import org.springframework.amqp.message.MessageSource;
-
 import java.util.Set;
 
-public interface Queue extends NamedComponent, MessageSource {
+public interface Queue extends NamedComponent {
 
     public enum Property implements CharSequence {
 
@@ -37,7 +34,5 @@ public interface Queue extends NamedComponent, MessageSource {
     }
 
     public Set<CharSequence> getProperties();
-
-    public void subscribe(MessageSink... messageSinks);
 
 }

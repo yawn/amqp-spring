@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.amqp.AMQException;
 import org.springframework.amqp.message.Message;
+import org.springframework.amqp.message.SentMessage;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -47,11 +48,11 @@ public class ExchangeImpl extends AbstractNamedComponent implements Exchange {
 
     }
 
-    public void send(Message message) {
+    public void send(SentMessage message) {
         send(message, message.getHeader().getRoutingKey());
     }
 
-    public void send(Message message, String routingKey) {
+    public void send(SentMessage message, String routingKey) {
 
         try {
             getChannel().basicPublish(getName(),

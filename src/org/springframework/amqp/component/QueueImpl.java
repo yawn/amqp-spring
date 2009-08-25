@@ -4,8 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.amqp.AMQException;
 import org.springframework.amqp.component.util.CollectionUtil;
-import org.springframework.amqp.message.Message;
-import org.springframework.amqp.message.MessageSink;
+import org.springframework.amqp.message.SentMessage;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -55,15 +54,11 @@ public class QueueImpl extends AbstractNamedComponent implements Queue {
 
     }
 
-    public void send(Message message) {
+    public void send(SentMessage message) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public void send(Message message, String routingKey) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void subscribe(MessageSink... messageSinks) {
+    public void send(SentMessage message, String routingKey) {
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
