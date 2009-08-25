@@ -32,17 +32,19 @@
     <!-- and a queue and two subscriptions -->
     <bean id="myQueue" class="org.springframework.amqp.component.common.ReplyQueue" parent="component"/>
 
-    <bean id="mySubscription" class="org.springframework.amqp.message.Subscription" parent="component">
+    <bean id="mySubscription" class="org.springframework.amqp.message.subscription.SimpleSubscription" parent="component">
+        <property name="noAck" value="false"/>
         <property name="queue" ref="myQueue"/>
-        <property name="receiver">
-            <bean class="org.springframework.amqp.message.TestConsumer"/>
+        <property name="messageSink">
+            <bean class="org.springframework.amqp.message.TestMessageSink"/>
         </property>
     </bean>
 
-    <bean id="mySubscription2" class="org.springframework.amqp.message.Subscription" parent="component">
+    <bean id="mySubscription2" class="org.springframework.amqp.message.subscription.SimpleSubscription" parent="component">
+        <property name="noAck" value="false"/>
         <property name="queue" ref="myQueue"/>
-        <property name="receiver">
-            <bean class="org.springframework.amqp.message.TestConsumer"/>
+        <property name="messageSink">
+            <bean class="org.springframework.amqp.message.TestMessageSink"/>
         </property>
     </bean>
 
@@ -76,6 +78,7 @@
         </property>
     </bean>
 
-    <bean class="org.springframework.amqp.util.AutoDeclaringBeanPostProcessor"/>
+    <bean class="org.springframework.amqp.util.AutoDeclaringBeanPostProcessor"
+            p:channelFactoryBean-ref="&amp;channelFactory"/>
 
 </beans>
